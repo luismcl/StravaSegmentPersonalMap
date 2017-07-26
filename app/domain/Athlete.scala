@@ -13,7 +13,7 @@ case class Athlete(_id: ObjectId, name:String, stravaID:Int, city:String, segmen
 
 object SegmentResume {
   def apply(sse: StravaSegmentEffort): SegmentResume = {
-    new SegmentResume(sse.getSegment.getName, sse.getSegment.getClimbCategory.ordinal(),
+    new SegmentResume(sse.getSegment.getName, sse.getSegment.getClimbCategory.getId,
       sse.getSegment.getEndLatlng.getLatitude.doubleValue, sse.getSegment.getEndLatlng.getLongitude.doubleValue(),
       sse.getSegment.getDistance.doubleValue, Date.from(sse.getStartDate.toInstant), sse.getElapsedTime, sse.getId)
   }
