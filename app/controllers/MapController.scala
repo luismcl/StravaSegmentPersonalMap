@@ -1,19 +1,19 @@
 package controllers
-import play.api.Configuration
 import javax.inject._
 
 import akka.actor._
 import akka.util.Timeout
 import domain.Athlete
+import play.api.Configuration
 import play.api.mvc._
 import services.actors.ReadAthleteDataRequest
-import play.api.routing._
+
 import scala.concurrent.ExecutionContext
 
 class MapController  @Inject()(cc: ControllerComponents, @Named("readDatabaseActor") readDatabaseActor: ActorRef, configuration:Configuration) (implicit executionContext: ExecutionContext)extends AbstractController(cc) {
 
-  import scala.concurrent.duration._
   import akka.pattern.ask
+  import scala.concurrent.duration._
   implicit val timeout: Timeout = 5.seconds
   private val apiKey:String = configuration.get[String]("maps.api.secret")
 

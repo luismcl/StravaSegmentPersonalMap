@@ -1,5 +1,7 @@
 @()
 
-@main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+@main("Strava Segment Maps") {
+<a   href="@routes.AuthorizationController.authorize()">
+    <img src="@routes.Assets.versioned("images/btn_strava_connectwith.png")"/>
+</a>
 }

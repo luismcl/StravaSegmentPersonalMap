@@ -20,7 +20,9 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
     case UpdateUserDataRequest(clientId, clientSecret, authorisationCode) => {
       val service = new AuthorisationServiceImpl
       val token = service.tokenExchange(clientId, clientSecret, authorisationCode)
-      activitiesActor ! ActivitiesRequest(new Strava(token), LocalDateTime.now().minusDays(60l), LocalDateTime.now())
+      val strava = new Strava(token)
+      sender ! strava.getAuthenticatedAthlete
+      activitiesActor ! ActivitiesRequest(strava, LocalDateTime.now().minusYears(1l), LocalDateTime.now())
     }
     case ActivitiesResponse(strava, activities) =>
       segmentsActor ! SegmentResumeRequest(strava, activities)
