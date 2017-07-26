@@ -1,0 +1,43 @@
+@(athlete:domain.Athlete,apiKey:String)
+<html lang="en">
+<head>
+    @* Here's where we render the page title `String`. *@
+    <title>My Map</title>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<div id="map" style="width:400px;height:400px;"></div>
+<script type="text/javascript">
+  function loadScript() {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=@apiKey&libraries=visualization&callback=initMap';
+    document.body.appendChild(script);
+  }
+  window.onload = loadScript();
+</script>
+
+<script>
+
+      	function initMap() {
+      	var labels = ["F","C","3","2","1","HC"];
+		  var myLatLng = {lat: -25.363, lng: 131.044};
+
+		  var map = new google.maps.Map(document.getElementById('map'), {
+		    zoom: 5,
+		    center: {lat: 40.780865, lng:  -4.001679}
+		  });
+          @for((segmentResume) <- athlete.segments){
+              new google.maps.Marker({
+                position: {lat: @segmentResume.latitude, lng:  @segmentResume.longitude},
+                map: map,
+                title: '@segmentResume.name',
+                label: labels[@segmentResume.climbCategory]
+              });
+          }
+		}
+
+</script>
+</body>
+</html>
