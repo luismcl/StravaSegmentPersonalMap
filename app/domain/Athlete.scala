@@ -15,8 +15,10 @@ object SegmentResume {
   def apply(sse: StravaSegmentEffort): SegmentResume = {
     new SegmentResume(sse.getSegment.getName, sse.getSegment.getClimbCategory.getId,
       sse.getSegment.getEndLatlng.getLatitude.doubleValue, sse.getSegment.getEndLatlng.getLongitude.doubleValue(),
-      sse.getSegment.getDistance.doubleValue, Date.from(sse.getStartDate.toInstant), sse.getElapsedTime, sse.getId)
+      sse.getSegment.getDistance.doubleValue, Date.from(sse.getStartDate.toInstant), sse.getElapsedTime, sse.getId,
+      sse.getSegment.getAverageGrade.doubleValue())
   }
 }
 case class SegmentResume(name:String, climbCategory:Int, latitude:Double, longitude:Double,
-                         distance:Double, lastDate:Date, elapsedTime:Int, segmentEffortId:Long)
+                         distance:Double, lastDate:Date, elapsedTime:Int, segmentEffortId:Long,
+                         averageGrade:Double)
