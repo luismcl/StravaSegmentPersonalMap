@@ -3,7 +3,7 @@ package services.actors
 import javax.inject.Inject
 
 import akka.actor.{Actor, ActorLogging}
-import domain.Athlete
+import domain.{Athlete, SegmentEffort}
 import org.mongodb.scala._
 import play.api.Configuration
 
@@ -14,16 +14,16 @@ case class ReadAthleteDataRequest(athleteId: Int)
 case class LookupError(e:Throwable)
 class ReadDatabaseActor @Inject()(configuration: Configuration, db: MongoDatabase) (implicit executionContext: ExecutionContext)extends Actor with ActorLogging {
 
-  private val collection: MongoCollection[Athlete] = db.getCollection("athlete")
+  private val segmentEffortcollection: MongoCollection[SegmentEffort] = db.getCollection("segmenteffort")
 
   override def receive: Receive = {
     case ReadAthleteDataRequest(athleteId) => {
       import org.mongodb.scala.model.Filters._
 
       val snd = sender()
-      collection.find(equal("stravaID", athleteId)).limit(1).head().onComplete({
-        case Success(result: Athlete) => {
-          log.info(s"Read Athlete $athleteId with Name ${result.name} Loaded")
+      segmentEffortcollection.find(equal("athleteId", athleteId)).toFuture().onComplete({
+        case Success(result: List[SegmentEffort]) => {
+          log.info(s"Read ${result.size} Athlete $athleteId segments efforts")
           snd ! result
         }
         case Failure(e) => {

@@ -3,12 +3,14 @@ import javax.inject._
 
 import akka.actor._
 import akka.util.Timeout
-import domain.Athlete
+import domain.{Athlete, SegmentEffort}
 import play.api.Configuration
 import play.api.mvc._
 import services.actors.ReadAthleteDataRequest
 
 import scala.concurrent.ExecutionContext
+import play.api.mvc.Cookie
+import play.api.mvc.DiscardingCookie
 
 class MapController  @Inject()(cc: ControllerComponents, @Named("readDatabaseActor") readDatabaseActor: ActorRef, configuration:Configuration) (implicit executionContext: ExecutionContext)extends AbstractController(cc) {
 
@@ -23,8 +25,8 @@ class MapController  @Inject()(cc: ControllerComponents, @Named("readDatabaseAct
 
   def buildmap(athleteId:Int) = Action.async  { implicit request: Request[AnyContent]  =>
     val future =  readDatabaseActor ? ReadAthleteDataRequest(athleteId)
-    future .mapTo[Athlete].map { athlete =>
-      Ok(views.js.buildmap.render(athlete)).as("text/javascript")
+    future .mapTo[List[SegmentEffort]].map { segmentEffort =>
+      Ok(views.js.buildmap.render(segmentEffort)).as("text/javascript")
     }
   }
 

@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule
-import domain.{Athlete, SegmentResume}
+import domain.{Athlete, Point, Segment, SegmentEffort}
 import org.mongodb.scala.{MongoClient, MongoDatabase}
 import play.api.libs.concurrent.AkkaGuiceSupport
 import play.api.{Configuration, Environment}
@@ -23,7 +23,13 @@ class Module(environment: Environment,
 
     System.setProperty("org.mongodb.async.type", "netty")
 
-    val codecRegistry = fromRegistries(fromProviders(classOf[SegmentResume]),fromProviders(classOf[Athlete]), DEFAULT_CODEC_REGISTRY)
+    val codecRegistry = fromRegistries(
+      fromProviders(classOf[Point]),
+      fromProviders(classOf[Athlete]),
+      fromProviders(classOf[Segment]),
+      fromProviders(classOf[SegmentEffort]),
+      DEFAULT_CODEC_REGISTRY)
+
     val client: MongoClient = MongoClient(uri)
     val db: MongoDatabase = client.getDatabase(databaseName).withCodecRegistry(codecRegistry)
 

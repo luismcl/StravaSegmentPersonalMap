@@ -1,4 +1,4 @@
-@(athlete:domain.Athlete)
+@(segmentEffort:List[domain.SegmentEffort])
 
 function initMap() {
     var labels = ["F","C","3","2","1","HC"];
@@ -9,23 +9,23 @@ function initMap() {
         center: {lat: 40.780865, lng:  -4.001679}
   });
 
-  @for((segmentResume) <- athlete.segments){
-      var marker_@segmentResume.segmentEffortId = new google.maps.Marker({
-        position: {lat: @segmentResume.latitude, lng:  @segmentResume.longitude},
+  @for((se) <- segmentEffort){
+      var marker_@se._id = new google.maps.Marker({
+        position: {lat: @se.segment.start.coordinates(0), lng:  @se.segment.start.coordinates(1)},
         map: map,
-        title: '@segmentResume.name',
-        label: labels[@segmentResume.climbCategory]
+        title: '@se.segment.name',
+        label: labels[@se.segment.climbCategory]
       });
 
-       marker_@{segmentResume.segmentEffortId}.addListener('click', function(){
-       showInfoWindow(marker_@segmentResume.segmentEffortId,
-                      '@segmentResume.name',
-                      '@segmentResume.distance',
-                      '@segmentResume.averageGrade',
-                      labels[@segmentResume.climbCategory],
-                      '@segmentResume.segmentEffortId',
-                      '@segmentResume.lastDate',
-                      '@segmentResume.elapsedTime'
+       marker_@{se._id}.addListener('click', function(){
+       showInfoWindow(marker_@se._id,
+                      '@se.segment.name',
+                      '@se.segment.distance',
+                      '@se.segment.averageGrade',
+                      labels[@se.segment.climbCategory],
+                      '@se._id',
+                      '@se.lastDate',
+                      '@se.elapsedTime'
        )});
   }
 }

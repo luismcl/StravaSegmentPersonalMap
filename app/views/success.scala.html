@@ -1,4 +1,4 @@
-@(stravaAthlete:javastrava.api.v3.model.StravaAthlete)
+@(stravaAthlete:domain.Athlete)
 <html lang="en">
 <head>
     <title>Success</title>
@@ -6,6 +6,6 @@
 </head>
 <body>
 <h1>Wait while we build the map, it can take few seconds</h1>
-<a  href="@routes.MapController.printMap(stravaAthlete.getId)">View @stravaAthlete.getFirstname @stravaAthlete.getLastname Segment Map</a>
+<a  href="@routes.MapController.printMap(stravaAthlete._id)">View @stravaAthlete.name Segment Map</a>
 </body>
 </html>

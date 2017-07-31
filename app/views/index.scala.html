@@ -1,7 +1,8 @@
-@()
+@()(implicit request: play.api.mvc.Request[Any])
 
 @main("Strava Segment Maps") {
 <a   href="@routes.AuthorizationController.authorize()">
     <img src="@routes.Assets.versioned("images/btn_strava_connectwith.png")"/>
 </a>
 }
+

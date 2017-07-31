@@ -1,11 +1,14 @@
 package services.actors
 
 import java.time.LocalDateTime
+import java.util.{Calendar, Date}
 import javastrava.api.v3.auth.impl.retrofit.AuthorisationServiceImpl
 import javastrava.api.v3.service.Strava
 import javax.inject.{Inject, Named}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import domain.Athlete
+import kiambogo.scrava.ScravaClient
 import services.actors.LoadDataActor.UpdateUserDataRequest
 
 object LoadDataActor {
@@ -20,14 +23,16 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
     case UpdateUserDataRequest(clientId, clientSecret, authorisationCode) => {
       val service = new AuthorisationServiceImpl
       val token = service.tokenExchange(clientId, clientSecret, authorisationCode)
-      val strava = new Strava(token)
-      sender ! strava.getAuthenticatedAthlete
-      activitiesActor ! ActivitiesRequest(strava, LocalDateTime.now().minusYears(1l), LocalDateTime.now())
+      val athlete:Athlete = Athlete(token.getAthlete, token.getToken)
+      sender ! athlete
+      val from = Calendar.getInstance
+      from.add(Calendar.YEAR,-1)
+      activitiesActor ! ActivitiesRequest(athlete, from.getTime, Calendar.getInstance.getTime)
     }
-    case ActivitiesResponse(strava, activities) =>
-      segmentsActor ! SegmentResumeRequest(strava, activities)
-    case SegmentsResponse(strava, segments) => {
-      updateDatabaseActor ! UpdateDatabaseRequest(strava.getAuthenticatedAthlete, segments)
+    case ActivitiesResponse(athlete, activities) =>
+      segmentsActor ! SegmentResumeRequest(athlete, activities)
+    case SegmentsResponse(athlete, segments) => {
+      updateDatabaseActor ! UpdateDatabaseRequest(athlete, segments)
     }
   }
 }

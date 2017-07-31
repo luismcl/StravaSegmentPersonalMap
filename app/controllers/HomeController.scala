@@ -13,6 +13,7 @@ import services.actors.LoadDataActor.UpdateUserDataRequest
 class HomeController @Inject()(cc: ControllerComponents, @Named("loadDataActor") loadDataActor: ActorRef, configuration: Configuration) extends AbstractController(cc) {
 
   def index() = Action { implicit request: Request[AnyContent] =>
+
     Ok(views.html.index())
   }
 }
