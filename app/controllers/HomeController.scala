@@ -20,7 +20,7 @@ class HomeController @Inject()(cc: ControllerComponents,
                               (implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   private val apiKey: String = configuration.get[String]("maps.api.secret")
-  val msg = Some("Please click in 'Login with strava' to load your segments")
+  val msg = Some(s"""Please <a href="${routes.AuthorizationController.authorize().url}">Login</a> to load your segments""")
 
   import akka.pattern.ask
 

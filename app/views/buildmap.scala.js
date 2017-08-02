@@ -8,6 +8,8 @@ function initMap() {
         center: {lat: 40.780865, lng:  -4.001679}
   });
 
+  document.getElementById("totalSegments").textContent="@segmentEffort.size";
+
   @for((se) <- segmentEffort){
       var marker_@se._id = new google.maps.Marker({
         position: {lat: @se.segment.end.coordinates(0), lng:  @se.segment.end.coordinates(1)},
