@@ -17,7 +17,7 @@ class ActivitiesActor extends Actor with ActorLogging {
   override def receive: Receive = {
     case ActivitiesRequest(athlete, from, to) =>
       val client = new ScravaClient(athlete.authToken)
-      val activities = client.listAthleteActivities(before=Some((to.getTime/1000L).toInt), after=Some((from.getTime/1000L).toInt))
+      val activities = client.listAthleteActivities(before=Some((to.getTime/1000L).toInt), after=Some((from.getTime/1000L).toInt), retrieveAll=true)
       log.debug(s"Load ${activities.size } activities")
       sender ! ActivitiesResponse(athlete, activities.filter(_.`type`.equalsIgnoreCase("ride")))
     case _ => sender ! BadRequest

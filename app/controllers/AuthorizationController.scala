@@ -23,7 +23,8 @@ class AuthorizationController @Inject()(cc: ControllerComponents,
   private val client:Int = configuration.get[Int]("strava.client")
   private val apiKey: String = configuration.get[String]("maps.api.secret")
 
-  val msg = Some("Please, wait few seconds while the map is build. <strong><a href=\"@routes.HomeController.index()\">Refresh Map</a></strong>")
+  routes.HomeController.index().url
+  val msg = Some(s""""Please, wait few seconds while the map is build. <strong><a href="${routes.HomeController.index().url}">Refresh Map</a></strong>""")
 
   def authorize() = Action { implicit request: Request[AnyContent] =>
 

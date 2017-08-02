@@ -38,18 +38,21 @@ class UpdateDatabaseActor @Inject()(db: MongoDatabase) extends Actor with ActorL
         override def onComplete(): Unit = println("Completed")
       })
 
-      segmentEffortcollection.insertMany(segments).subscribe(new Observer[Completed] {
-        override def onNext(result: Completed): Unit = log.info(s"Athlete ${athlete._id} Segment Inserted  updated: ${result.productArity}")
+      if (segments.nonEmpty) {
+        segmentEffortcollection.insertMany(segments).subscribe(new Observer[Completed] {
+          override def onNext(result: Completed): Unit = log.info(s"Athlete ${athlete._id} Segment Inserted  updated: ${result.productArity}")
 
-        override def onError(e: Throwable): Unit = {
-          e.printStackTrace()
-          log.error(s"Athlete ${athlete._id} Failed {}", e)
+          override def onError(e: Throwable): Unit = {
+            e.printStackTrace()
+            log.error(s"Athlete ${athlete._id} Failed {}", e)
+          }
+
+          override def onComplete(): Unit = println(s"Completed inserts of ${athlete._id} ")
         }
-
-        override def onComplete(): Unit = println(s"Completed inserts of ${athlete._id} ")
+        )
+      }else{
+        log.error(s"Athlete ${athlete._id} does no has segments")
       }
-
-      )
     }
   }
 }

@@ -11,7 +11,7 @@
 @if(messageBox.isDefined){
 <div class="alert info" id="infoBanner">
   <span class="closebtn" onclick="closeBanner()">&times;</span>
-  @messageBox.get
+  @Html(messageBox.get)
 </div>
 
 }
@@ -28,6 +28,15 @@
     }
     <a href="@routes.HomeController.index()">Refresh Map</a>
     <a href="#">About</a>
+
+    @athlete match {
+        case Some(a) => {
+            <span>Athlete:<strong>@a.name<strong></span>
+            <span>City:<strong>@a.city<strong></span>
+            <span>Last Map Update:<strong>@a.lastUpdate<strong></span>
+        }
+        case None => {<span>Not Loged User</span>}
+    }
 </div>
 
 <span style="font-size:30px;cursor:pointer" onclick="openNav()">☰</span><span style="font-size:30px">Strava Segment Map</span>
