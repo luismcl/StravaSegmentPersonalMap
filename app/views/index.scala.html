@@ -1,8 +1,55 @@
-@()(implicit request: play.api.mvc.Request[Any])
+@(athlete:Option[domain.Athlete],apiKey:String, messageBox:Option[String] = None)(implicit request: play.api.mvc.Request[Any])
+<html lang="en">
+<head>
+    <title>Strava Segment Maps</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+</head>
+<body>
+<script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
 
-@main("Strava Segment Maps") {
-<a   href="@routes.AuthorizationController.authorize()">
-    <img src="@routes.Assets.versioned("images/btn_strava_connectwith.png")"/>
-</a>
+@if(messageBox.isDefined){
+<div class="alert info" id="infoBanner">
+  <span class="closebtn" onclick="closeBanner()">&times;</span>
+  @messageBox.get
+</div>
+
 }
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    @athlete match {
+        case Some(a) => {
+            <a href="#">Update Database</a>
+        }
+        case None => {
+            <a   href="@routes.AuthorizationController.authorize()">Login with Strava</a>
+        }
+    }
+    <a href="@routes.HomeController.index()">Refresh Map</a>
+    <a href="#">About</a>
+</div>
+
+<span style="font-size:30px;cursor:pointer" onclick="openNav()">☰</span><span style="font-size:30px">Strava Segment Map</span>
+<a style="float:right" href="http://www.strava.com" target="_blank"><img style="height:30" src="@routes.Assets.versioned("images/api_logo_pwrdBy_strava_horiz_light.png")"/></a>
+
+<div id="map" style="width:100%;height:100%"></div>
+
+
+@athlete match {
+case Some(a) => {
+<script type='text/javascript' src="@routes.MapController.buildmap(a._id)"></script>
+<script type='text/javascript'
+        src="https://maps.googleapis.com/maps/api/js?key=@apiKey&libraries=visualization&callback=initMap"></script>
+}
+case None => {
+<script type='text/javascript'
+        src="https://maps.googleapis.com/maps/api/js?key=@apiKey&libraries=visualization&callback=emptyMap"></script>
+}
+}
+</body>
+</html>
+
+
+
 

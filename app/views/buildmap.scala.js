@@ -2,7 +2,6 @@
 
 function initMap() {
     var labels = ["F","C","3","2","1","HC"];
-    var myLatLng = {lat: -25.363, lng: 131.044};
 
     var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 5,
@@ -11,7 +10,7 @@ function initMap() {
 
   @for((se) <- segmentEffort){
       var marker_@se._id = new google.maps.Marker({
-        position: {lat: @se.segment.start.coordinates(0), lng:  @se.segment.start.coordinates(1)},
+        position: {lat: @se.segment.end.coordinates(0), lng:  @se.segment.end.coordinates(1)},
         map: map,
         title: '@se.segment.name',
         label: labels[@se.segment.climbCategory]

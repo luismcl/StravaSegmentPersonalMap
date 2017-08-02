@@ -4,16 +4,48 @@ package controllers
 import javax.inject._
 
 import akka.actor.ActorRef
+import akka.util.Timeout
+import domain.Athlete
 import play.api.Configuration
 import play.api.mvc._
-import services.actors.LoadDataActor.UpdateUserDataRequest
+import services.actors.{AthleteNotFound, ReadAthleteDataRequest}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, @Named("loadDataActor") loadDataActor: ActorRef, configuration: Configuration) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents,
+                               configuration: Configuration,
+                               @Named("readDatabaseActor") readDatabaseActor: ActorRef)
+                              (implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
-  def index() = Action { implicit request: Request[AnyContent] =>
+  private val apiKey: String = configuration.get[String]("maps.api.secret")
+  val msg = Some("Please click in 'Login with strava' to load your segments")
 
-    Ok(views.html.index())
+  import akka.pattern.ask
+
+  import scala.concurrent.duration._
+
+  implicit val timeout: Timeout = 5.seconds
+
+
+  def index() = Action.async { implicit request: Request[AnyContent] =>
+
+    request.cookies.get("athlete") match {
+      case Some(cookie) => {
+        val future = readDatabaseActor ? ReadAthleteDataRequest(cookie.value.toInt)
+
+        future.map {
+          case (athlete: Athlete) => Ok(views.html.index(Some(athlete), apiKey))
+          case (AthleteNotFound(athleteId)) => Ok(views.html.index(None, apiKey, msg)).discardingCookies(DiscardingCookie("athlete"))
+        }
+      }
+      case None => {
+        Future {
+          Ok(views.html.index(None, apiKey, msg))
+        }(executionContext)
+      }
+
+    }
   }
 }

@@ -6,7 +6,7 @@ import akka.util.Timeout
 import domain.{Athlete, SegmentEffort}
 import play.api.Configuration
 import play.api.mvc._
-import services.actors.ReadAthleteDataRequest
+import services.actors.ReadSegmentAthleteDataRequest
 
 import scala.concurrent.ExecutionContext
 import play.api.mvc.Cookie
@@ -19,12 +19,8 @@ class MapController  @Inject()(cc: ControllerComponents, @Named("readDatabaseAct
   implicit val timeout: Timeout = 5.seconds
   private val apiKey:String = configuration.get[String]("maps.api.secret")
 
-  def printMap(athleteId:Int) = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.map(athleteId,apiKey))
-  }
-
   def buildmap(athleteId:Int) = Action.async  { implicit request: Request[AnyContent]  =>
-    val future =  readDatabaseActor ? ReadAthleteDataRequest(athleteId)
+    val future =  readDatabaseActor ? ReadSegmentAthleteDataRequest(athleteId)
     future .mapTo[List[SegmentEffort]].map { segmentEffort =>
       Ok(views.js.buildmap.render(segmentEffort)).as("text/javascript")
     }

@@ -7,7 +7,6 @@
 GET     /                           controllers.HomeController.index
 GET     /authorize                  controllers.AuthorizationController.authorize
 GET     /authorizeCallback          controllers.AuthorizationController.authorizeCallback(code:String)
-GET     /map                        controllers.MapController.printMap(athleteId:Int)
 
 GET     /buildmap.js                controllers.MapController.buildmap(athleteId:Int)
 
