@@ -48,6 +48,8 @@ function initMap() {
 
   document.getElementById("totalSegments").textContent="@segmentEffort.size";
 
+  var markers = new Array()
+
   @for((se) <- segmentEffort){
       var marker_@se._id = new google.maps.Marker({
         position: {lat: @se.segment.end.coordinates(0), lng:  @se.segment.end.coordinates(1)},
@@ -67,7 +69,12 @@ function initMap() {
                       '@se.lastDate',
                       '@se.elapsedTime'
        )});
+
+       markers.push(marker_@{se._id});
   }
+
+  var markerCluster = new MarkerClusterer(map, markers,
+              {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
 function placeCallback(results, status) {
