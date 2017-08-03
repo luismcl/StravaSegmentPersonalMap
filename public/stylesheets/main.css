@@ -14,7 +14,7 @@
 
 /* The navigation menu links */
 .sidenav a {
-    padding: 8px 8px 8px 32px;
+    padding: 8px 8px 8px 20px;
     text-decoration: none;
     font-size: 25px;
     color: #818181;
@@ -36,16 +36,30 @@
     margin-left: 50px;
 }
 
+.athleteInfoBox {
+    position: absolute;
+    bottom: 10%;
+}
 .athleteInfo {
-    padding: 8px 8px 8px 32px;
+    padding: 1px 1px 1px 25px;
     text-decoration: none;
     font-size: 15px;
     color: #818181;
     display: block;
     transition: 0.3s
 }
+
+.athleteInfo a {
+    padding: 1px 1px 1px 0px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
+
 .athleteInfoTitle {
-    padding: 8px 8px 8px 32px;
+    padding: 2px 2px 2px 20px;
     text-decoration: none;
     font-size: 15px;
     color: #FC4C02;

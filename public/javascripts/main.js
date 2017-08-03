@@ -49,3 +49,4 @@ function showInfoWindow(marker, name, distance,averageGrade,climbCategory,segmen
         infowindow.setContent(contentString);
         infowindow.open(map, marker);
 }
+

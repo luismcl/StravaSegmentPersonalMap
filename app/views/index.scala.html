@@ -17,7 +17,7 @@
 }
 
 <div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <span class="athleteInfoTitle">Strava Segment Map</span><a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     @athlete match {
         case Some(a) => {
             <a href="#">Update Database</a>
@@ -31,11 +31,11 @@
 
     @athlete match {
         case Some(a) => {
-        <div>
+        <div class="athleteInfoBox">
             <span class="athleteInfoTitle">Athlete</span>
-            <span class="athleteInfo"><a style="font-size: 15px;" href="https://www.strava.com/athletes/@a._id" target="_blank">@a.name</a></span>
+            <span class="athleteInfo"><a href="https://www.strava.com/athletes/@a._id" target="_blank">@a.name</a></span>
             <span class="athleteInfoTitle">City:</span>
-            <span class="athleteInfo">@a.city</span>
+            <span id="cityValue" class="athleteInfo">@a.city</span>
             <span class="athleteInfoTitle">Last Map Update</span>
             <span class="athleteInfo">@a.lastUpdate</span>
             <span class="athleteInfoTitle">Total Segments</span>
@@ -56,7 +56,8 @@
 case Some(a) => {
 <script type='text/javascript' src="@routes.MapController.buildmap(a._id)"></script>
 <script type='text/javascript'
-        src="https://maps.googleapis.com/maps/api/js?key=@apiKey&libraries=visualization&callback=initMap"></script>
+        src="https://maps.googleapis.com/maps/api/js?key=@apiKey&libraries=visualization,places&callback=initMap"></script>
+
 }
 case None => {
 <script type='text/javascript'
