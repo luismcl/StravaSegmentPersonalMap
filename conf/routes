@@ -5,6 +5,9 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
+GET     /view-athlete-map           controllers.HomeController.view
+GET     /policy                     controllers.HomeController.policy
+GET     /about                      controllers.HomeController.about
 GET     /authorize                  controllers.AuthorizationController.authorize
 GET     /authorizeCallback          controllers.AuthorizationController.authorizeCallback(code:String)
 

@@ -46,7 +46,7 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
           snd!athlete
           log.info(s"Load Activities for Athlete ${athlete._id}")
           val from = Calendar.getInstance
-          from.add(Calendar.YEAR,-2)
+          from.add(Calendar.MONTH,-6)
           activitiesActor ! ActivitiesRequest(athlete, from.getTime, Calendar.getInstance.getTime)
         }
       }

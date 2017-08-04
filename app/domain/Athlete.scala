@@ -12,6 +12,10 @@ object SegmentEffort{
    new SegmentEffort(sse.id, sse.athlete("id"), format.parse(sse.start_date),
      Segment.apply(sse.segment), sse.kom_rank.getOrElse(0), sse.elapsed_time)
   }
+  def apply(sse: StravaSegmentEffort, attemps:Int):SegmentEffort = {
+    new SegmentEffort(sse.id, sse.athlete("id"), format.parse(sse.start_date),
+      Segment.apply(sse.segment), sse.kom_rank.getOrElse(0), sse.elapsed_time)
+  }
 }
 case class SegmentEffort(_id:Long, athleteId:Int, lastDate:Date, segment:Segment, komRank:Int, elapsedTime:Long)
 
@@ -43,3 +47,4 @@ object Point{
   def apply(coordinates: List[Double]): Point = new Point("Point", coordinates)
 }
 case class Point(`type`:String, coordinates:List[Double])
+

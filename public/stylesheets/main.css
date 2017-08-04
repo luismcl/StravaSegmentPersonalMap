@@ -1,3 +1,12 @@
+.title{
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    transition: 0.3s
+}
+
+
+
 /* The side navigation menu */
 .sidenav {
     height: 100%; /* 100% Full-height */
@@ -11,6 +20,15 @@
     padding-top: 60px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
 }
+
+.sidenav h2 {
+    font-size: 15px;
+    color: #FC4C02;
+    position: absolute;
+    top: 0;
+    margin-left: 2px;
+}
+
 
 /* The navigation menu links */
 .sidenav a {
@@ -59,6 +77,15 @@
 }
 
 .athleteInfoTitle {
+    padding: 2px 2px 2px 20px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #FC4C02;
+    display: block;
+    transition: 0.3s
+}
+
+.athleteInfoTitle a {
     padding: 2px 2px 2px 20px;
     text-decoration: none;
     font-size: 15px;

@@ -1,3 +1,6 @@
+
+var clipboard = new Clipboard('.btn');
+
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
 }
@@ -50,3 +53,11 @@ function showInfoWindow(marker, name, distance,averageGrade,climbCategory,segmen
         infowindow.open(map, marker);
 }
 
+//From http://www.joserodriguez.info/bloc/resolver-la-politica-de-cookies-en-tu-web/
+function controlcookies() {
+         // si variable no existe se crea (al clicar en Aceptar)
+    localStorage.controlcookie = (localStorage.controlcookie || 0);
+
+    localStorage.controlcookie++; // incrementamos cuenta de la cookie
+    cookie1.style.display='none'; // Esconde la política de cookies
+}
