@@ -38,15 +38,24 @@ function initMap() {
         zoom: 8
   });
 
-    console.log("City:"+document.getElementById('cityValue').textContent)
-    var request = {
-        query: document.getElementById('cityValue').textContent
-      };
+    var request
+    if (document.getElementById('cityValueOtherAthlete') !== null) {
+        request = {
+            query: document.getElementById('cityValueOtherAthlete').textContent
+        }
+    } else {
+        request = {
+            query: document.getElementById('cityValue').textContent
+        }
+    }
+
 
     service = new google.maps.places.PlacesService(map);
     service.textSearch(request, placeCallback);
 
-  document.getElementById("totalSegments").textContent="@segmentEffort.size";
+    if (document.getElementById('totalSegments') !== null) {
+        document.getElementById("totalSegments").textContent="@segmentEffort.size";
+    }
 
   var markers = new Array()
 

@@ -6,6 +6,7 @@
         case Some(a) => {
         <div class="alert info">
             <a href="https://www.strava.com/athletes/@a._id" target="_blank">@a.name</a> Segment Map
+            <span style="visibility:hidden" id="cityValueOtherAthlete">@a.city</span>
         </div>
         <div id="map" style="width:100%;height:80%"></div>
 
