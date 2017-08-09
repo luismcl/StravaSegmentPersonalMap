@@ -8,7 +8,7 @@ import domain.Athlete
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc._
-import services.actors.{AthleteNotFound, UpdateDataBaseRequest, UpdateUserDataRequest}
+import services.actors.{AthleteNotFound, UpdateSegmentDatabaseRequest, UpdateUserDataRequest}
 
 import scala.concurrent.ExecutionContext
 

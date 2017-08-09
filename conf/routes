@@ -3,11 +3,12 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-# An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 GET     /view-athlete-map           controllers.HomeController.view(athleteId:Option[String])
 GET     /policy                     controllers.HomeController.policy
 GET     /about                      controllers.HomeController.about
+GET     /update                     controllers.HomeController.updateDatabase
+
 GET     /authorize                  controllers.AuthorizationController.authorize
 GET     /authorizeCallback          controllers.AuthorizationController.authorizeCallback(code:String)
 

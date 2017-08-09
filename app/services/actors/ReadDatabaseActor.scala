@@ -26,7 +26,7 @@ class ReadDatabaseActor @Inject()(configuration: Configuration, db: MongoDatabas
     case ReadSegmentAthleteDataRequest(athleteId) => {
       val snd = sender()
       segmentEffortcollection.find(equal("athleteId", athleteId)).toFuture().onComplete({
-        case Success(result: List[SegmentEffort]) => {
+        case Success(result: Seq[SegmentEffort]) => {
           log.info(s"Read ${result.size} Athlete $athleteId segments efforts")
           snd ! result
         }

@@ -7,7 +7,7 @@ import akka.util.Timeout
 import domain.Athlete
 import play.api.Configuration
 import play.api.mvc._
-import services.actors.{AthleteNotFound, ReadAthleteDataRequest, UpdateDataBaseRequest, UpdateUserDataRequest}
+import services.actors.{AthleteNotFound, ReadAthleteDataRequest, UpdateSegmentDatabaseRequest, UpdateUserDataRequest}
 import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,7 +51,7 @@ class HomeController @Inject()(cc: ControllerComponents,
 
     readAthleteFromSession match {
       case Some(athlete: Athlete) => {
-        loadDataActor ! UpdateDataBaseRequest(athlete)
+        loadDataActor ! UpdateSegmentDatabaseRequest(athlete)
         Ok(views.html.index(Some(athlete), apiKey, AuthorizationController.msg))
       }
       case None => Ok(views.html.index(None, apiKey, msg)).withNewSession
@@ -83,12 +83,12 @@ class HomeController @Inject()(cc: ControllerComponents,
       case otherAthlete: Option[Athlete] => {
         readAthleteFromSession match {
           case athlete: Option[Athlete] => Ok(views.html.viewAthleteMap(athlete, otherAthlete, apiKey))
-          case None => Ok(views.html.viewAthleteMap(None, otherAthlete, apiKey, msg))
+          case _ => Ok(views.html.viewAthleteMap(None, otherAthlete, apiKey, msg))
         }
-      } case None => {
+      } case _ => {
         readAthleteFromSession match {
           case Some(athlete: Athlete) => NotFound(views.html.index(Some(athlete), apiKey, Some(s"Athlete: ${athleteID.getOrElse("invalid")} Not Found"))).withNewSession
-          case None => NotFound(views.html.index(None, apiKey, Some(s"Athlete: ${athleteID.getOrElse("invalid")} Not Found"))).withNewSession
+          case _ => NotFound(views.html.index(None, apiKey, Some(s"Athlete: ${athleteID.getOrElse("invalid")} Not Found"))).withNewSession
         }
       }
     }
