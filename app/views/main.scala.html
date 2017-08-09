@@ -47,7 +47,7 @@
             <span class="athleteInfoTitle">Total Segments</span>
             <span class="athleteInfo" id="totalSegments">0</span>
             <span class="athleteInfoTitle">
-                <a href="#" class="btn" data-clipboard-text="@routes.HomeController.view.absoluteURL()?athlete=@a._id">
+                <a href="#" class="btn" data-clipboard-text="@routes.HomeController.view(Some(a._id.toString)).absoluteURL">
                     Get share Link
                 </a>
             </span>

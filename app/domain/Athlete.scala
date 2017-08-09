@@ -2,8 +2,10 @@ package domain
 
 import java.util.Date
 import javastrava.api.v3.model.StravaAthlete
+import play.api.libs.functional.syntax._
 
-import kiambogo.scrava.models.{AthleteSummary, SegmentSummary => StravaSegment, SegmentEffort => StravaSegmentEffort}
+import kiambogo.scrava.models.{SegmentEffort => StravaSegmentEffort, SegmentSummary => StravaSegment}
+import play.api.libs.json.{Json, OFormat, __}
 
 object SegmentEffort{
   val format = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -34,12 +36,22 @@ object Segment{
 case class Segment(stravaSegmentId:Int, name:String, climbCategory:Int,
                    distance:Double, start:Point, end:Point, averageGrade:Double, elevationHigh:Double)
 
-object Athlete {
-  def apply(athlete:AthleteSummary, token:String): Athlete =
-    new Athlete(athlete.id, s"${athlete.firstname} ${athlete.lastname}", athlete.city, new Date,token)
-
+object Athlete extends ((Int, String, String, Date, String) => Athlete) {
   def apply(athlete:StravaAthlete, token:String): Athlete =
     new Athlete(athlete.getId, s"${athlete.getFirstname} ${athlete.getLastname}", athlete.getCity, new Date,token)
+
+  def apply(_id: Int, name: String, city: String, lastUpdate: Date, authToken: String): Athlete = new Athlete(_id, name, city, lastUpdate, authToken)
+
+  implicit val athleteReads = (
+    (__ \ '_id).read[Int] ~
+      (__ \ 'name).read[String] ~
+      (__ \ 'city).read[String] ~
+      (__ \ 'lastUpdate).read[Date] ~
+      (__ \ 'authToken).read[String]
+    )(Athlete.apply(_:Int, _:String,_:String, _:Date,_:String))
+
+  implicit val athleteFormat: OFormat[Athlete] = Json.format[Athlete]
+
 }
 case class Athlete(_id:Int, name:String, city:String, lastUpdate:Date, authToken:String)
 

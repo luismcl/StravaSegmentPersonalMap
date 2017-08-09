@@ -2,124 +2,111 @@ package controllers
 
 
 import javax.inject._
-
 import akka.actor.ActorRef
 import akka.util.Timeout
 import domain.Athlete
 import play.api.Configuration
 import play.api.mvc._
-import services.actors.{AthleteNotFound, ReadAthleteDataRequest}
+import services.actors.{AthleteNotFound, ReadAthleteDataRequest, UpdateDataBaseRequest, UpdateUserDataRequest}
+import play.api.libs.json._
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents,
                                configuration: Configuration,
-                               @Named("readDatabaseActor") readDatabaseActor: ActorRef)
+                               @Named("readDatabaseActor") readDatabaseActor: ActorRef,
+                               @Named("loadDataActor") loadDataActor: ActorRef)
                               (implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   private val apiKey: String = configuration.get[String]("maps.api.secret")
   val msg = Some(s"""Please <a href="${routes.AuthorizationController.authorize().url}">Login</a> to load your segments""")
 
-  import akka.pattern.ask
 
-  import scala.concurrent.duration._
-
-  implicit val timeout: Timeout = 5.seconds
-
-
-  def index() = Action.async { implicit request: Request[AnyContent] =>
-
-    request.cookies.get("athlete") match {
-      case Some(cookie) => {
-        val future = readDatabaseActor ? ReadAthleteDataRequest(cookie.value.toInt)
-
-        future.map {
-          case (athlete: Athlete) => Ok(views.html.index(Some(athlete), apiKey))
-          case (AthleteNotFound(athleteId)) => Ok(views.html.index(None, apiKey, msg)).discardingCookies(DiscardingCookie("athlete"))
+  private def readAthleteFromSession()(implicit request: Request[AnyContent]): Option[Athlete] = {
+    request.session.get("athleteJS") match {
+      case Some(athleteString) => {
+        val jsValueAthlete: JsValue = Json.parse(athleteString)
+        val athleteJsResult: JsResult[Athlete] = Json.fromJson[Athlete](jsValueAthlete)
+        athleteJsResult match {
+          case JsSuccess(athlete: Athlete, path: JsPath) => Some(athlete)
+          case e: JsError => None
         }
       }
-      case None => {
-        Future {
-          Ok(views.html.index(None, apiKey, msg))
-        }(executionContext)
-      }
-
+      case None => None
     }
   }
 
-  def view() = Action.async { implicit request: Request[AnyContent] =>
+
+  def index() = Action { implicit request: Request[AnyContent] =>
+
+    readAthleteFromSession match {
+      case Some(athlete: Athlete) => Ok(views.html.index(Some(athlete), apiKey))
+      case None => Ok(views.html.index(None, apiKey, msg)).withNewSession
+    }
+  }
+
+  def updateDatabase() = Action { implicit request: Request[AnyContent] =>
+
+    readAthleteFromSession match {
+      case Some(athlete: Athlete) => {
+        loadDataActor ! UpdateDataBaseRequest(athlete)
+        Ok(views.html.index(Some(athlete), apiKey, AuthorizationController.msg))
+      }
+      case None => Ok(views.html.index(None, apiKey, msg)).withNewSession
+    }
+  }
 
 
-    val otherAthleteFuture = request.queryString("athlete") match {
-      case athleteId :: tail => {
+  def view(athleteID: Option[String]) = Action.async { implicit request: Request[AnyContent] =>
+    import akka.pattern.ask
+    import scala.concurrent.duration._
+    implicit val timeout: Timeout = 5.seconds
+
+    val otherAthleteFuture = athleteID match {
+      case Some(athleteId) => {
         val future = readDatabaseActor ? ReadAthleteDataRequest(athleteId.toInt)
         future.map {
           case (athlete: Athlete) => Some(athlete)
           case (AthleteNotFound(athleteId)) => None
         }
-      } case _ => {
-        Future { None
+      }
+      case None => {
+        Future {
+          None
         }(executionContext)
       }
     }
 
-    val otherAthlete = Await.result(otherAthleteFuture, 5 seconds)
-
-    request.cookies.get("athlete") match {
-      case Some(cookie) => {
-        val future = readDatabaseActor ? ReadAthleteDataRequest(cookie.value.toInt)
-
-        future.map {
-          case (athlete: Athlete) => Ok(views.html.viewAthleteMap(Some(athlete),otherAthlete, apiKey))
-          case (AthleteNotFound(athleteId)) =>  Ok(views.html.viewAthleteMap(None, otherAthlete, apiKey, msg)).discardingCookies(DiscardingCookie("athlete"))
+    otherAthleteFuture.map {
+      case otherAthlete: Option[Athlete] => {
+        readAthleteFromSession match {
+          case athlete: Option[Athlete] => Ok(views.html.viewAthleteMap(athlete, otherAthlete, apiKey))
+          case None => Ok(views.html.viewAthleteMap(None, otherAthlete, apiKey, msg))
+        }
+      } case None => {
+        readAthleteFromSession match {
+          case Some(athlete: Athlete) => NotFound(views.html.index(Some(athlete), apiKey, Some(s"Athlete: ${athleteID.getOrElse("invalid")} Not Found"))).withNewSession
+          case None => NotFound(views.html.index(None, apiKey, Some(s"Athlete: ${athleteID.getOrElse("invalid")} Not Found"))).withNewSession
         }
       }
-      case None => {
-        Future {
-          Ok(views.html.viewAthleteMap(None,otherAthlete, apiKey, msg))
-        }(executionContext)
-      }
+    }
 
+
+  }
+
+  def about() = Action { implicit request: Request[AnyContent] =>
+    readAthleteFromSession match {
+      case Some(athlete: Athlete) => Ok(views.html.about(Some(athlete)))
+      case None => Ok(views.html.about(None)).withNewSession
     }
   }
 
-  def about() = Action.async { implicit request: Request[AnyContent] =>
-    request.cookies.get("athlete") match {
-      case Some(cookie) => {
-        val future = readDatabaseActor ? ReadAthleteDataRequest(cookie.value.toInt)
-
-        future.map {
-          case (athlete: Athlete) => Ok(views.html.about(Some(athlete)))
-          case (AthleteNotFound(athleteId)) => Ok(views.html.about(None)).discardingCookies(DiscardingCookie("athlete"))
-        }
-      }
-      case None => {
-        Future {
-          Ok(views.html.about(None))
-        }(executionContext)
-      }
-
-    }
-  }
-
-  def policy() = Action.async { implicit request: Request[AnyContent] =>
-    request.cookies.get("athlete") match {
-      case Some(cookie) => {
-        val future = readDatabaseActor ? ReadAthleteDataRequest(cookie.value.toInt)
-
-        future.map {
-          case (athlete: Athlete) => Ok(views.html.policy(Some(athlete)))
-          case (AthleteNotFound(athleteId)) => Ok(views.html.policy(None)).discardingCookies(DiscardingCookie("athlete"))
-        }
-      }
-      case None => {
-        Future {
-          Ok(views.html.policy(None))
-        }(executionContext)
-      }
-
+  def policy() = Action { implicit request: Request[AnyContent] =>
+    readAthleteFromSession match {
+      case Some(athlete: Athlete) => Ok(views.html.policy(Some(athlete)))
+      case None => Ok(views.html.policy(None)).withNewSession
     }
   }
 }

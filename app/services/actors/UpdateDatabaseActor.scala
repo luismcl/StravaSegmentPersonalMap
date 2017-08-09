@@ -1,5 +1,6 @@
 package services.actors
 
+import java.util.Calendar
 import javastrava.api.v3.model.StravaAthlete
 import javax.inject.Inject
 
@@ -26,7 +27,7 @@ class UpdateDatabaseActor @Inject()(db: MongoDatabase) extends Actor with ActorL
         combine(set("name", athlete.name),
           set("city", athlete.city),
           set("authToken", athlete.authToken),
-          set("lastUpdate", athlete.lastUpdate)),
+          set("lastUpdate", Calendar.getInstance.getTime)),
         UpdateOptions.apply().upsert(true)).subscribe(new Observer[UpdateResult] {
         override def onNext(result: UpdateResult): Unit = log.info(s"Athlete ${athlete._id} updated: ${result.getMatchedCount}")
 

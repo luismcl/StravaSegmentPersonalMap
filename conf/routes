@@ -5,7 +5,7 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
-GET     /view-athlete-map           controllers.HomeController.view
+GET     /view-athlete-map           controllers.HomeController.view(athleteId:Option[String])
 GET     /policy                     controllers.HomeController.policy
 GET     /about                      controllers.HomeController.about
 GET     /authorize                  controllers.AuthorizationController.authorize

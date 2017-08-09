@@ -15,6 +15,7 @@ import play.api.mvc.DiscardingCookie
 import scala.concurrent.ExecutionContext
 
 case class UpdateUserDataRequest(clientId: Integer, clientSecret: String, authorisationCode: String)
+case class UpdateDataBaseRequest(athlete: Athlete)
 
 
 
@@ -44,6 +45,7 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
         case (AthleteNotFound(athleteId)) => {
           val athlete:Athlete = Athlete(token.getAthlete, token.getToken)
           snd!athlete
+
           log.info(s"Load Activities for Athlete ${athlete._id}")
           val from = Calendar.getInstance
           from.add(Calendar.MONTH,-6)
@@ -51,6 +53,10 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
         }
       }
 
+    }case UpdateDataBaseRequest(athlete) => {
+        log.info(s"Update Activities for Athlete ${athlete._id}")
+        val from = athlete.lastUpdate
+        activitiesActor ! ActivitiesRequest(athlete, from, Calendar.getInstance.getTime)
     }
     case ActivitiesResponse(athlete, activities) =>
       segmentsActor ! SegmentResumeRequest(athlete, activities)
