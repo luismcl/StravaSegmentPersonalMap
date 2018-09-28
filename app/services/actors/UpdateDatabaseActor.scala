@@ -12,24 +12,31 @@ import org.mongodb.scala.model.UpdateOptions
 import org.mongodb.scala.model.Updates._
 import org.mongodb.scala.result.UpdateResult
 
-case class UpdateDatabaseRequest(athlete: Athlete, segments: List[SegmentEffort])
+case class UpdateSegmentRequest(segment: SegmentEffort)
 
 class UpdateDatabaseActor @Inject()(db: MongoDatabase) extends Actor with ActorLogging {
 
-  private val athleteCollection: MongoCollection[Athlete] = db.getCollection("athlete")
-  private val segmentEffortcollection: MongoCollection[SegmentEffort] = db.getCollection("segmenteffort")
+  private val segmentEffortCollection: MongoCollection[SegmentEffort] = db.getCollection("segmenteffort")
 
 
   override def receive: Receive = {
-    case UpdateDatabaseRequest(athlete, segments) => {
+    case UpdateSegmentRequest(segment) => {
 
-      athleteCollection.updateOne(equal("_id", athlete._id),
-        combine(set("name", athlete.name),
-          set("city", athlete.city),
-          set("authToken", athlete.authToken),
-          set("lastUpdate", Calendar.getInstance.getTime)),
+      segmentEffortCollection.updateOne(equal("_id", segment._id),
+        combine(set("athleteId", segment.athleteId),
+          set("elapsedTime", segment.elapsedTime),
+          set("komRank", segment.komRank),
+          set("komRank", segment.lastDate),
+          set("segment.averageGrade", segment.segment.averageGrade),
+          set("segment.climbCategory", segment.segment.climbCategory),
+          set("segment.distance", segment.segment.distance),
+          set("segment.segment", segment.segment.elevationHigh),
+          set("segment.end", segment.segment.end),
+          set("segment.name", segment.segment.name),
+          set("segment.segment", segment.segment.start),
+          set("segment.stravaSegmentId", segment.segment.stravaSegmentId)),
         UpdateOptions.apply().upsert(true)).subscribe(new Observer[UpdateResult] {
-        override def onNext(result: UpdateResult): Unit = log.info(s"Athlete ${athlete._id} updated: ${result.getMatchedCount}")
+        override def onNext(result: UpdateResult): Unit = log.debug(s"Athlete ${athlete._id} updated: ${result.getMatchedCount} segment")
 
         override def onError(e: Throwable): Unit = {
           e.printStackTrace()
@@ -38,22 +45,6 @@ class UpdateDatabaseActor @Inject()(db: MongoDatabase) extends Actor with ActorL
 
         override def onComplete(): Unit = println("Completed")
       })
-
-      if (segments.nonEmpty) {
-        segmentEffortcollection.insertMany(segments).subscribe(new Observer[Completed] {
-          override def onNext(result: Completed): Unit = log.info(s"Athlete ${athlete._id} Segment Inserted  updated: ${result.productArity}")
-
-          override def onError(e: Throwable): Unit = {
-            e.printStackTrace()
-            log.error(s"Athlete ${athlete._id} Failed {}", e)
-          }
-
-          override def onComplete(): Unit = println(s"Completed inserts of ${athlete._id} ")
-        }
-        )
-      }else{
-        log.error(s"Athlete ${athlete._id} does no has segments")
-      }
     }
   }
 }

@@ -11,6 +11,7 @@ class Module(environment: Environment,
     bindActor[LoadDataActor]("loadDataActor")
     bindActor[ActivitiesActor]("activitiesActor")
     bindActor[SegmentsActor]("segmentsActor")
+    bindActor[UpdateAthleteActor]("updateAthleteActor")
     bindActor[UpdateDatabaseActor]("updateDatabaseActor")
     bindActor[ReadDatabaseActor]("readDatabaseActor")
 

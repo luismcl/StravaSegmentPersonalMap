@@ -21,7 +21,7 @@ case class UpdateSegmentDatabaseRequest(athlete: Athlete)
 
 class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRef,
                               @Named("segmentsActor") segmentsActor: ActorRef,
-                              @Named("updateDatabaseActor") updateDatabaseActor: ActorRef,
+                              @Named("updateAthleteActor") updateAthleteActor: ActorRef,
                               @Named("readDatabaseActor") readDatabaseActor: ActorRef)
                              (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
 
@@ -45,10 +45,11 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
         case (AthleteNotFound(athleteId)) => {
           val athlete:Athlete = Athlete(token.getAthlete, token.getToken)
           snd!athlete
+          updateAthleteActor ! UpdateAthleteRequest(athlete)
 
-          log.info(s"Load Activities for Athlete ${athlete._id}")
+          log.info(s"Load Activities for Athlete $athleteId")
           val from = Calendar.getInstance
-          from.add(Calendar.MONTH,-6)
+          from.add(Calendar.MONTH,-12)
           activitiesActor ! ActivitiesRequest(athlete, from.getTime, Calendar.getInstance.getTime)
         }
       }
@@ -58,11 +59,9 @@ class LoadDataActor @Inject()(@Named("activitiesActor") activitiesActor: ActorRe
         val from = athlete.lastUpdate
         activitiesActor ! ActivitiesRequest(athlete, from, Calendar.getInstance.getTime)
     }
+
     case ActivitiesResponse(athlete, activities) =>
       segmentsActor ! SegmentResumeRequest(athlete, activities)
-    case SegmentsResponse(athlete, segments) => {
-      updateDatabaseActor ! UpdateDatabaseRequest(athlete, segments)
-    }
   }
 }
 
